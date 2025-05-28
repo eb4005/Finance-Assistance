@@ -1,4 +1,3 @@
-# scraper_agent/main.py
 from fastapi import FastAPI
 from newspaper import Article
 import requests
@@ -18,29 +17,44 @@ def clean_text(text):
 @app.get("/scrape_news")
 def scrape_news():
     scraped_data = {}
-    
+
     try:
         # TSMC News from Yahoo Finance
         tsmc_url = "https://finance.yahoo.com/quote/TSM/news?p=TSM"
         response = requests.get(tsmc_url, headers=HEADERS, timeout=10)
         soup = BeautifulSoup(response.text, 'html.parser')
-        articles = soup.find_all('li', {'class': 'js-stream-content'})[:3]
-        scraped_data["TSMC"] = [{
-            "title": clean_text(art.find('h3').text),
-            "summary": clean_text(art.find('p').text) if art.find('p') else ""
-        } for art in articles if art.find('h3')]
+        articles = soup.find_all('li', {'class': 'js-stream-content'})
+        print("TSMC Response Code:", response.status_code)
+        print("TSMC HTML Snippet:", response.text[:1000])
+        print(f"TSMC Articles Found: {len(articles)}")
+        scraped_data["TSMC"] = []
+        for art in articles[:3]:
+            h3 = art.find('h3')
+            p = art.find('p')
+            if h3:
+                scraped_data["TSMC"].append({
+                    "title": clean_text(h3.text),
+                    "summary": clean_text(p.text) if p else ""
+                })
 
         # Samsung News from Yahoo Finance
         samsung_url = "https://finance.yahoo.com/quote/005930.KS/news?p=005930.KS"
         response = requests.get(samsung_url, headers=HEADERS, timeout=10)
         soup = BeautifulSoup(response.text, 'html.parser')
-        articles = soup.find_all('li', {'class': 'js-stream-content'})[:3]
-        scraped_data["Samsung"] = [{
-            "title": clean_text(art.find('h3').text),
-            "summary": clean_text(art.find('p').text) if art.find('p') else ""
-        } for art in articles if art.find('h3')]
+        articles = soup.find_all('li', {'class': 'js-stream-content'})
+        print(f"Samsung Articles Found: {len(articles)}")
+        scraped_data["Samsung"] = []
+        for art in articles[:3]:
+            h3 = art.find('h3')
+            p = art.find('p')
+            if h3:
+                scraped_data["Samsung"].append({
+                    "title": clean_text(h3.text),
+                    "summary": clean_text(p.text) if p else ""
+                })
 
     except Exception as e:
+        print(f"Scraper Error: {str(e)}")
         scraped_data = {"error": str(e)}
 
     return scraped_data
