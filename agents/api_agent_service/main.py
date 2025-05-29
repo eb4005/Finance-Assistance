@@ -19,7 +19,7 @@ class EarningsAnalyzer:
             "portfolio.csv"
         )
         
-        
+
         if not os.path.exists(portfolio_path):
             raise FileNotFoundError(f"Portfolio file missing at: {portfolio_path}")
             
@@ -35,6 +35,7 @@ class EarningsAnalyzer:
 
     def get_earnings_surprises(self):
         surprises = {}
+        
         for ticker in self.portfolio['ticker'].unique():
             try:
                 stock = yf.Ticker(ticker)
