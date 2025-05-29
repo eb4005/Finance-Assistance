@@ -19,6 +19,7 @@ class EarningsAnalyzer:
             "portfolio.csv"
         )
         
+        
         if not os.path.exists(portfolio_path):
             raise FileNotFoundError(f"Portfolio file missing at: {portfolio_path}")
             
