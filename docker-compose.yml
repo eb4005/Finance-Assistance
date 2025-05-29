@@ -1,59 +1,93 @@
-version: '3.8'
+# version: '3.8'
+
+# services:
+#   orchestrator:
+#     build: ./agents/orchestrator
+#     ports:
+#       - "8000:8000"
+#     depends_on:
+#       - exposure
+#       - retriever
+#       - news
+#       - llm
+#       - voice
+
+#   streamlit_ui:
+#     build: ./agents/streamlit_app
+#     ports:
+#       - "8501:8501"
+#     depends_on:
+#       - orchestrator
+
+#   exposure:
+#     build: ./agents/api_agent_service
+#     ports:
+#       - "8001:8000"
+
+#   retriever:
+#     build: ./agents/retriever_agent_service
+#     ports:
+#       - "8002:8000"
+
+#   news:
+#     build: ./agents/scraping_agent_service
+#     ports:
+#       - "8003:8000"
+
+#   llm:
+#     build: ./agents/llm_agent_service
+#     ports:
+#       - "8400:8000"
+
+#   voice:
+#     build: ./agents/voice_agent
+#     ports:
+#       - "8500:8000"
+
+
+version: '3.9'
 
 services:
-  orchestrator:
-    build: ./orchestrator
-    ports:
-      - "8000:8000"
-    depends_on:
-      - api
-      - scraper
-      - retriever
-      - llm
-      - voice
-
-  api:
-    build: ./agents
-    command: uvicorn api_agent:app --host 0.0.0.0 --port 8001
+  api-agent:
+    build: ./agents/api_agent_service
     ports:
       - "8001:8001"
 
-  scraper:
-    build: ./agents
-    command: uvicorn scraping_agent:app --host 0.0.0.0 --port 8003
+  retriever-agent:
+    build: ./agents/retriever_agent_service
+    ports:
+      - "8002:8002"
+
+  scraping-agent:
+    build: ./agents/scraping_agent_service
     ports:
       - "8003:8003"
 
-  retriever:
-    build: ./agents
-    command: uvicorn retriever_agent:app --host 0.0.0.0 --port 8002
+  llm-agent:
+    build: ./agents/llm_agent_service
     ports:
-      - "8002:8002"
-    volumes:
-      - ./data:/app/data  # Persistent storage for vector index
+      - "8004:8004"
 
-  llm:
-    build: ./agents
-    command: uvicorn llm_agent:app --host 0.0.0.0 --port 8400
+  voice-agent:
+    build: ./agents/voice_agent
     ports:
-      - "8400:8400"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+      - "8005:8005"
+    depends_on:
+      - llm-agent
 
-  voice:
-    build: ./agents
-    command: uvicorn voice_agent:app --host 0.0.0.0 --port 8500
+  orchestrator:
+    build: ./orchestrator/orchestrator_service
     ports:
-      - "8500:8500"
+      - "8000:8000"
+    depends_on:
+      - api-agent
+      - retriever-agent
+      - scraping-agent
+      - llm-agent
+      - voice-agent
 
-  streamlit:
+  streamlit-app:
     build: ./streamlit_app
-    command: streamlit run app.py --server.port 8501 --server.address 0.0.0.0
     ports:
       - "8501:8501"
     depends_on:

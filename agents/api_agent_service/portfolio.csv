@@ -1,0 +1,5 @@
+ticker,sector,region,weight
+TSM,Technology,Asia,0.15
+005930.KS,Technology,Asia,0.10
+AAPL,Technology,Global,0.20
+BABA,Technology,Asia,0.05
