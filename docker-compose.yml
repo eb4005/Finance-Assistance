@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  orchestrator:
+    build: ./orchestrator
+    ports:
+      - "8000:8000"
+    depends_on:
+      - api
+      - scraper
+      - retriever
+      - llm
+      - voice
+
+  api:
+    build: ./agents
+    command: uvicorn api_agent:app --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+
+  scraper:
+    build: ./agents
+    command: uvicorn scraping_agent:app --host 0.0.0.0 --port 8003
+    ports:
+      - "8003:8003"
+
+  retriever:
+    build: ./agents
+    command: uvicorn retriever_agent:app --host 0.0.0.0 --port 8002
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./data:/app/data  # Persistent storage for vector index
+
+  llm:
+    build: ./agents
+    command: uvicorn llm_agent:app --host 0.0.0.0 --port 8400
+    ports:
+      - "8400:8400"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  voice:
+    build: ./agents
+    command: uvicorn voice_agent:app --host 0.0.0.0 --port 8500
+    ports:
+      - "8500:8500"
+
+  streamlit:
+    build: ./streamlit_app
+    command: streamlit run app.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    depends_on:
+      - orchestrator
