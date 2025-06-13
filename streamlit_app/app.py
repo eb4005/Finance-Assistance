@@ -8,7 +8,9 @@ st.title(" Multi-Agent Finance Assistant")
 
 option = st.radio("Choose input method:", ("Text Query", "Voice Upload"))
 
-ORCHESTRATOR_URL = "http://localhost:8000"
+# ORCHESTRATOR_URL = "http://localhost:8000"
+ORCHESTRATOR_URL = "http://orchestrator:8000"
+
 
 if option == "Text Query":
     query = st.text_input("Enter your query", "What's our Asia tech exposure?")

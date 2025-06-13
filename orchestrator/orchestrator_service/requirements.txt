@@ -1,5 +1,10 @@
 fastapi
 uvicorn
-requests
 aiohttp
-pydantic
+python-dotenv
+pytz
+pandas
+requests
+python-multipart
+tenacity==8.2.3  # For retry decorator
+aiohttp==3.9.3

@@ -1,8 +1,10 @@
 fastapi
 uvicorn
 transformers
-torch
-TTS
+torch==2.1.0  # or whichever is working for your platform
+TTS==0.20.2  # tested version
 aiohttp
 python-multipart
-
+scipy
+numpy
+soundfile

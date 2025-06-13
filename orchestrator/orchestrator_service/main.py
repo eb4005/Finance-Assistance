@@ -1,6 +1,13 @@
-
-
+# Add to the top of your file
 from fastapi import FastAPI, HTTPException, UploadFile, File
+# app = FastAPI()
+
+
+
+
+
+
+
 from pydantic import BaseModel
 import requests
 import logging
@@ -43,7 +50,7 @@ SERVICE_CONFIG = {
         }
     },
     "voice": {
-        "port": 8500,
+        "port": 8005,
         "timeout": 15,
         "endpoints": {
             "stt": "/stt",
@@ -54,6 +61,11 @@ SERVICE_CONFIG = {
 
 def service_url(service: str, endpoint: str) -> str:
     return f"http://localhost:{SERVICE_CONFIG[service]['port']}{SERVICE_CONFIG[service]['endpoints'][endpoint]}"
+
+
+def service_url(service: str, endpoint: str) -> str:
+    cfg = SERVICE_CONFIG[service]
+    return f"http://{cfg['host']}:{cfg['port']}{cfg['endpoints'][endpoint]}"
 
 def safe_request(method: str, url: str, json_data: dict = None, timeout: int = 5):
     try:

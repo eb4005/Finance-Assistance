@@ -1,5 +1,54 @@
 
 
+# version: '3.9'
+
+# services:
+#   api-agent:
+#     build: ./agents/api_agent_service
+#     ports:
+#       - "8001:8001"
+
+#   retriever-agent:
+#     build: ./agents/retriever_agent_service
+#     ports:
+#       - "8002:8002"
+
+#   scraping-agent:
+#     build: ./agents/scraping_agent_service
+#     ports:
+#       - "8003:8003"
+
+#   llm-agent:
+#     build: ./agents/llm_agent_service
+#     ports:
+#       - "8004:8004"
+
+#   voice-agent:
+#     build: ./agents/voice_agent
+#     ports:
+#       - "8005:8005"
+#     depends_on:
+#       - llm-agent
+
+#   orchestrator:
+#     build: ./orchestrator/orchestrator_service
+#     ports:
+#       - "8000:8000"
+#     depends_on:
+#       - api-agent
+#       - retriever-agent
+#       - scraping-agent
+#       - llm-agent
+#       - voice-agent
+
+#   streamlit-app:
+#     build: ./streamlit_app
+#     ports:
+#       - "8501:8501"
+#     depends_on:
+#       - orchestrator
+
+
 version: '3.9'
 
 services:
@@ -7,6 +56,8 @@ services:
     build: ./agents/api_agent_service
     ports:
       - "8001:8001"
+    volumes:
+      - ./data_ingestion:/data_ingestion  # Mount the folder containing portfolio.csv
 
   retriever-agent:
     build: ./agents/retriever_agent_service
@@ -47,3 +98,84 @@ services:
       - "8501:8501"
     depends_on:
       - orchestrator
+
+
+
+
+# # Define a custom network
+# networks:
+#   app-network:
+#     driver: bridge
+
+# services:
+#   api-agent:
+#     build: ./agents/api_agent_service
+#     ports:
+#       - "8001:8001"
+#     volumes:
+#       - ./data_ingestion:/data_ingestion
+#     networks:
+#       - app-network  # Add to network
+
+#   retriever-agent:
+#     build: ./agents/retriever_agent_service
+#     ports:
+#       - "8002:8002"
+#     networks:
+#       - app-network  # Add to network
+
+#   scraping-agent:
+#     build: ./agents/scraping_agent_service
+#     ports:
+#       - "8003:8003"
+#     networks:
+#       - app-network  # Add to network
+
+#   llm-agent:
+#     build: ./agents/llm_agent_service
+#     ports:
+#       - "8004:8400"  # Host:8004 → Container:8400
+#     networks:
+#       - app-network  # Add to network
+
+#   voice-agent:
+#     build: ./agents/voice_agent
+#     ports:
+#       - "8005:8000"  # Host:8005 → Container:8000
+#     depends_on:
+#       - llm-agent
+#     networks:
+#       - app-network  # Add to network
+
+#   orchestrator:
+#     build: 
+#       context: ./orchestrator/orchestrator_service
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8000:8000"
+#     depends_on:
+#       - api-agent
+#       - retriever-agent
+#       - scraping-agent
+#       - llm-agent
+#       - voice-agent
+#     networks:
+#       - app-network  # Add to network
+#     # Add healthcheck dependencies
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
+#   streamlit-app:
+#     build: ./streamlit_app
+#     ports:
+#       - "8501:8501"
+#     depends_on:
+#       orchestrator:
+#         condition: service_healthy
+#     networks:
+#       - app-network  # Add to network
+
+# # All services use the same network
